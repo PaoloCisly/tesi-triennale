@@ -1,4 +1,11 @@
-def knn_search(X_train, y_train):
+import os.path
+
+import utils
+
+def knn_search(dataset, X_train, y_train, force = False):
+    if not force or os.path.isfile(f'{dataset.name}_{utils.Model.KNN.name}_grid_config.pkl'):
+        return load_grid_config(dataset, utils.Model.KNN)
+
     from sklearn.model_selection import GridSearchCV
     from sklearn.neighbors import KNeighborsClassifier
 
@@ -18,4 +25,4 @@ def knn_search(X_train, y_train):
     print(f'K-NN Best Parameters: {grid_search.best_params_}')
     print(f'K-NN Best Score: {grid_search.best_score_}')
 
-    return grid_search.best_params_, grid_search.best_score_
+    return grid_search.best_params_
