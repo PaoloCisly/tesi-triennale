@@ -1,21 +1,58 @@
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
+import time
 
-import model_tuning
+import model_tuning, utils
 
-dataset = pd.read_csv('data/mushroom_cleaned.csv')
+def run(dataset_type: utils.Dataset):
+    X_train, X_test, y_train, y_test = utils.load_dataset(dataset_type)
 
-# Splitting the dataset into the Training set and Test set
-X = dataset.drop('class', axis=1)
-y = dataset['class']
+    knn_time = time.time()
+    # K-Nearest Neighbors (K-NN)
+    knn_best_params = model_tuning.knn_search(dataset_type, X_train, y_train)
+    knn_time = time.time() - knn_time
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    nb_time = time.time()
+    # Naive Bayes
+    nb_best_params = model_tuning.nb_search(dataset_type, X_train, y_train)
+    nb_time = time.time() - nb_time
 
-# Feature Scaling
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
+    nn_time = time.time()
+    # Neural Network
+    nn_best_params = model_tuning.nn_search(dataset_type, X_train, y_train)
+    nn_time = time.time() - nn_time
 
-# K-Nearest Neighbors (K-NN)
-knn_best_params, knn_best_score = model_tuning.knn_search(X_train, y_train)
+    rf_time = time.time()
+    # Random Forest
+    rf_best_params = model_tuning.rf_search(dataset_type, X_train, y_train)
+    rf_time = time.time() - rf_time
+
+    svm_time = time.time()
+    # Support Vector Machine (SVM)
+    svm_best_params = model_tuning.svm_search(dataset_type, X_train, y_train)
+    svm_time = time.time() - svm_time
+
+    # xgb_time = time.time()
+    # # XGBoost
+    # xgb_best_params = model_tuning.xgb_search(dataset_type, X_train, y_train)
+    # xgb_time = time.time() - xgb_time
+
+    print(f'K-Nearest Neighbors Best Parameters: \n{knn_best_params}')
+    print(f'K-Nearest Neighbors Time: {knn_time:.2f}s\n\n')
+
+    print(f'Naive Bayes Best Parameters: \n{nb_best_params}')
+    print(f'Naive Bayes Time: {nb_time:.2f}s\n\n')
+
+    print(f'Neural Network Best Parameters: \n{nn_best_params}')
+    print(f'Neural Network Time: {nn_time:.2f}s\n\n')
+
+    print(f'Random Forest Best Parameters: \n{rf_best_params}')
+    print(f'Random Forest Time: {rf_time:.2f}s\n\n')
+
+    print(f'Support Vector Machine Best Parameters: \n{svm_best_params}')
+    print(f'Support Vector Machine Time: {svm_time:.2f}s\n\n')
+
+    # print(f'XGBoost Best Parameters: \n{xgb_best_params}')
+    # print(f'XGBoost Time: {xgb_time:.2f}s\n\n')
+
